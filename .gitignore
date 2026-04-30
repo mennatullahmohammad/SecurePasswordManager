@@ -1,0 +1,22 @@
+# Private keys - NEVER commit these
+keys/*_private_key.json
+
+# Vault files contain sensitive data
+vaults/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
