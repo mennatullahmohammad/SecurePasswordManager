@@ -1,4 +1,4 @@
-from Crypto.Util.number import getPrime, isPrime, inverse
+from Crypto.Util.number import getPrime, isPrime
 from Crypto.Random.random import randint
 from math import gcd
 import json
@@ -35,12 +35,12 @@ def generate_params(bits=512):
 def generate_and_store():
     global p, q, alpha
     p, q, alpha = generate_params()
-    save_to_json("params.json", {"p": str(p), "q": str(q), "alpha": str(alpha)})
+    save_to_json("config.json", {"p": str(p), "q": str(q), "alpha": str(alpha)})
 
 
 def load_params():
     global p, q, alpha
-    data = load_json("params.json")
+    data = load_json("config.json")
     p = int(data["p"])
     q = int(data["q"])
     alpha = int(data["alpha"])
