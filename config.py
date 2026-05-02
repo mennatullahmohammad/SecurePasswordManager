@@ -1,6 +1,5 @@
 from Crypto.Util.number import getPrime, isPrime
 from Crypto.Random.random import randint
-from math import gcd
 import json
 
 
