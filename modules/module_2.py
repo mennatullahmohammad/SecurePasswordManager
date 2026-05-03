@@ -29,7 +29,6 @@ def _save_vault(username: str, vault: dict):
 def encrypt_credentials(credentials: list, key: bytes) -> str:
     plaintext = json.dumps(credentials).encode()
     nonce = os.urandom(16)
-    cipher = AES.new(key, AES.MODE_GCM)
     cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
     ciphertext, tag = cipher.encrypt_and_digest(plaintext)
     bundle = nonce + tag + ciphertext        
@@ -51,7 +50,7 @@ def _sign_vault(encrypted_vault: str, private_key: dict, public_key: dict) -> di
     q=int(public_key["q"])
     alpha=int(public_key["alpha"])
     vault_hash = module_3.hash_vault(encrypted_vault)
-    r, s = module_3.sign(vault_hash, private_key["x"],q,alpha)
+    r, s = module_3.sign(vault_hash, int(private_key["x"]), q, alpha)
     return {"r": str(r), "s": str(s)}
 
 def _verify_vault(encrypted_vault: str, signature: dict, public_key: dict) -> bool:
@@ -135,3 +134,18 @@ def update_credential(username: str, master_password: str, site: str, new_userna
     vault["signature"] = _sign_vault(vault["encrypted_vault"], private_key, public_key)
     _save_vault(username, vault)
     print(f"Credential for '{site}' updated successfully.")
+
+def delete_credential(username: str, master_password: str, site: str):
+    private_key, public_key = module_1.initialize_user(username)
+    vault = _load_vault(username)
+    if not _verify_vault(vault["encrypted_vault"], vault["signature"], public_key):
+        raise PermissionError("Invalid signature")
+    key = derive_key(master_password)
+    credentials = decrypt_credentials(vault["encrypted_vault"], key)
+    new_credentials = [c for c in credentials if c["site"] != site]
+    if len(new_credentials) == len(credentials):
+        raise ValueError(f"No entry found for '{site}'.")
+    vault["encrypted_vault"] = encrypt_credentials(new_credentials, key)
+    vault["signature"] = _sign_vault(vault["encrypted_vault"], private_key, public_key)
+    _save_vault(username, vault)
+    print(f"Credential for '{site}' deleted successfully.")
