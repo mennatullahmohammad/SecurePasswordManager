@@ -78,7 +78,60 @@ def initialize_vault(username: str, master_password: str):
       _save_vault(username, vault)
       print(f"Vault initialized for '{username}'")
 
+def add_credential(username: str, master_password: str,site: str, site_username: str, site_password: str):
+    private_key, public_key = module_1.initialize_user(username)
+    vault = _load_vault(username)
+    if not _verify_vault(vault["encrypted_vault"], vault["signature"], public_key):
+        raise PermissionError("Vault signature invalid! File may have been tampered with.")
+    key = derive_key(master_password)
+    credentials = decrypt_credentials(vault["encrypted_vault"], key)
+    for c in credentials:
+        if c["site"] == site:
+            raise ValueError(f"Entry for '{site}' already exists. Use update instead.")
 
-      
+    credentials.append({
+        "site": site,
+        "username": site_username,
+        "password": site_password
+    })
+    vault["encrypted_vault"] = encrypt_credentials(credentials, key)
+    vault["signature"] = _sign_vault(vault["encrypted_vault"], private_key, public_key)
+    _save_vault(username, vault)
+    print(f"Credential for '{site}' added successfully.")
 
+def get_credentials(username: str, master_password: str, site: str = None) -> list:
+    private_key, public_key = module_1.initialize_user(username)
+    vault = _load_vault(username)
+    if not _verify_vault(vault["encrypted_vault"], vault["signature"], public_key):
+        raise PermissionError("Invalid signature")
+    key = derive_key(master_password)
+    credentials = decrypt_credentials(vault["encrypted_vault"], key)
+    if site:
+        for c in credentials:
+            if c["site"] == site:
+                return [c]
+        raise ValueError(f"No entry found for '{site}'.")
+    return credentials
 
+def update_credential(username: str, master_password: str, site: str, new_username: str = None, new_password: str = None):
+    private_key, public_key = module_1.initialize_user(username)
+    vault = _load_vault(username)
+    if not _verify_vault(vault["encrypted_vault"], vault["signature"], public_key):
+        raise PermissionError("Invalid signature")
+    key = derive_key(master_password)
+    credentials = decrypt_credentials(vault["encrypted_vault"], key)
+    found=False
+    for c in credentials:
+        if c["site"] == site:
+            found=True
+            if new_username is not None:
+                c["username"] = new_username
+            if new_password is not None:
+                c["password"] = new_password
+            break
+    if not found:
+        raise ValueError(f"No entry found for '{site}'.")
+    vault["encrypted_vault"] = encrypt_credentials(credentials, key)
+    vault["signature"] = _sign_vault(vault["encrypted_vault"], private_key, public_key)
+    _save_vault(username, vault)
+    print(f"Credential for '{site}' updated successfully.")
