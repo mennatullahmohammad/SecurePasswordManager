@@ -9,14 +9,18 @@ def solve(filepath):
         if i % 2 == 0:
             c+=1
     even = c == len(numbers)
-    decoded= []
-    for n in numbers:
-        original = n >> 1
-        char= chr(original)
-        decoded.append(char)
-    flag = ''.join(decoded)
-    print(F"FLAG: {flag}")
-    return flag
+    if even:
+        decoded= []
+        for n in numbers:
+            original = n >> 1
+            char= chr(original)
+            decoded.append(char)
+        flag = ''.join(decoded)
+        print(F"FLAG: {flag}")
+        return flag
+    else:
+        print("Not all numbers are even. Cannot decode.")
+        return None
 
 
 if __name__ == "__main__":
