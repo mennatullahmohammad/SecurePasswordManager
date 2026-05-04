@@ -15,7 +15,7 @@ def solve(filepath):
         char= chr(original)
         decoded.append(char)
     flag = ''.join(decoded)
-    print(f"\nFLAG: {flag}")
+    print(F"FLAG: {flag}")
     return flag
 
 
