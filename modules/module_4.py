@@ -50,8 +50,10 @@ def _transfer_path(sender:str, receiver:str)->str:
 
 
 def export_vault(sender:str,receiver:str,master_password:str):
-    priv_path=f"keys/{sender}_private_key.json" 
-    sender_public_path=f"keys/{sender}_public_key.json" 
+    sender=sender.lower()
+    receiver=receiver.lower()
+    priv_path=f"keys/{sender}_private_key.json"
+    sender_public_path=f"keys/{sender}_public_key.json"
     receiver_public_path=f"keys/{receiver}_public_key.json"
 
     if not os.path.exists(priv_path):
@@ -105,7 +107,9 @@ def export_vault(sender:str,receiver:str,master_password:str):
     print(f"Transfer file: {path}")
 
 def import_vault(receiver:str,sender:str,master_password:str):
-    priv_path=f"keys/{receiver}_private_key.json" 
+    receiver=receiver.lower()
+    sender=sender.lower()
+    priv_path=f"keys/{receiver}_private_key.json"
     sender_public_path=f"keys/{sender}_public_key.json"
 
     if not os.path.exists(priv_path):
@@ -113,7 +117,7 @@ def import_vault(receiver:str,sender:str,master_password:str):
     if not os.path.exists(sender_public_path):
         raise FileNotFoundError(f"Keys not found for '{sender}'.") 
     
-    receiver_priv=config.load_json(priv_path)
+    receiver_priv=config.load_json(priv_path) #just reads the file in the path
     sender_public=config.load_json(sender_public_path)
 
     path=_transfer_path(sender,receiver)

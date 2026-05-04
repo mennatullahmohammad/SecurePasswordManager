@@ -38,7 +38,7 @@ def print_menu():
 
 def get_username():
     while True:
-        username = input("Enter your username: ").strip()
+        username = input("Enter your username: ").strip().lower()
         if username:
             return username
         print("Username cannot be empty.")
@@ -178,7 +178,7 @@ def handle_delete(username):
 def handle_export(username):
     try:
         import module_4
-        recipient = input("Enter recipient username: ").strip()
+        recipient = input("Enter recipient username: ").strip().lower()
         if not recipient:
             print("Recipient username cannot be empty.")
             return
@@ -191,7 +191,7 @@ def handle_export(username):
 def handle_import(username):
     try:
         import module_4
-        sender = input("Enter sender username: ").strip()
+        sender = input("Enter sender username: ").strip().lower()
         if not sender:
             print("Sender username cannot be empty.")
             return
