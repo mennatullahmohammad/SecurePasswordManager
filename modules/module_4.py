@@ -25,4 +25,13 @@ def hash_key(key):
 ################## AES-GCM ###################
 # bundle: nonce(16)+tag(16)+ciphertext 
 
+def AES_encrypt(plaintext: bytes,key: bytes)->str:
+    cipher= AES.new(key,AES.MODE_GCM)
+    ciphertext,tag=cipher.encrypt_and_digest(plaintext)
+    bundle=cipher.nonce+tag+ciphertext
+    return base64.b64encode(bundle).decode()
+
+def AES_decrypt(bundle: str,key: bytes)->bytes:
+    raw = base64.b64decode(bundle)
+    nonce=raw[]
 
